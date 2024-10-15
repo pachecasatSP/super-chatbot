@@ -6,5 +6,6 @@ namespace backend.super_chatbot.Repositories
     {
         Task<Client> CreateClient(Client entity);
         Task<Client> Get(int Id);
+        Task<Client> GetByPhoneNumber(string display_phone_number);
     }
 }

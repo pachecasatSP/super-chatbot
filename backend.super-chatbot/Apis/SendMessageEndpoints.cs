@@ -17,14 +17,8 @@ namespace backend.super_chatbot.Apis
                     {
                         body = request.Message
                     },
-                    To = request.NumeroDestino
-                }, new Sender()
-                {
-                    Nome = context.Items["userName"]?.ToString(),
-                    TelNumber = context.Items["telNumber"]?.ToString(),
-                    TelId = context.Items["metaPhoneId"]?.ToString(),
-                    Id = context.Items["clientId"]?.ToString(),
-                });
+                    To = $"55{request.NumeroDestino}"
+                }, int.Parse(context.Items["clientId"]?.ToString()));
 
 
                 return DefaultResults.CreateOkResult();
