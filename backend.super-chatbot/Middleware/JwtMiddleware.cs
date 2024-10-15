@@ -6,7 +6,7 @@ namespace backend.super_chatbot.Middleware;
 public class JwtMiddleware
 {
     private readonly RequestDelegate _next;
-    private List<string> publicEndpoints = ["HTTP: POST /client", "HTTP: GET /webhook", "HTTP: POST /webhook", "HTTP: GET /webhook => Hub"];
+    private List<string> publicEndpoints = ["HTTP: POST /client", "HTTP: GET /webhook", "HTTP: POST /webhook", "HTTP: GET /webhook => ReadHub"];
 
     public JwtMiddleware(RequestDelegate next)
     {

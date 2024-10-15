@@ -11,11 +11,11 @@ namespace backend.super_chatbot.Apis
 
         public static void MapWebhookEndpoints(this IEndpointRouteBuilder routes)
         {
-            routes.MapGet("/webhook", Hub);
+            routes.MapGet("/webhook", ReadHub);
 
-            static string Hub(string mode = "", string verify_token = "", string challenge = "")
+            static string ReadHub([FromQuery(Name = "hub.mode")] string mode, [FromQuery(Name = "hub.verify_token")] string verify_token, [FromQuery(Name = "hub.challenge")] string challenge)
             {
-                if(mode=="subscribe" &&  verify_token==verifyToken)
+                if (mode == "subscribe" && verify_token == verifyToken)
                     return challenge;
 
                 return string.Empty;
@@ -29,7 +29,7 @@ namespace backend.super_chatbot.Apis
         }
     }
 
-    
 
-   
+
+
 }
