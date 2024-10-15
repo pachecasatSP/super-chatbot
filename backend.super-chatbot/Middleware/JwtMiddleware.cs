@@ -14,25 +14,16 @@ public class JwtMiddleware
     }
 
     public async Task InvokeAsync(HttpContext context)
-    {        
-        try
+    {
+        if (publicEndpoints.Contains(context.GetEndpoint()?.DisplayName!))
         {
-            if (publicEndpoints.Contains(context.GetEndpoint()?.DisplayName!))
-                await _next(context);
-
-            var token = context.Request.Headers.Authorization.FirstOrDefault()?.Split(" ").Last();
-
-            if (token is null)
-                throw new Exception();
-
-            await AttachUserToContext(context, token!);
-
             await _next(context);
         }
-        catch (Exception ex)
+        else
         {
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            await context.Response.CompleteAsync();
+            var token = (context.Request.Headers.Authorization.FirstOrDefault()?.Split(" ").Last()) ?? throw new Exception();
+            await AttachUserToContext(context, token!);
+            await _next(context);
         }
     }
 
@@ -45,7 +36,7 @@ public class JwtMiddleware
             throw new Exception("Token nao e valido");
 
         var name = openToken.Claims.First(x => x.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new ArgumentException("Token inválido.");
-        var telNumber  = openToken.Claims.First(x => x.Type == ClaimTypes.MobilePhone)?.Value ?? throw new ArgumentException("Token inválido.");
+        var telNumber = openToken.Claims.First(x => x.Type == ClaimTypes.MobilePhone)?.Value ?? throw new ArgumentException("Token inválido.");
         var metaPhoneId = openToken.Claims.First(x => x.Type == "metaphoneid")?.Value ?? throw new ArgumentException("Token inválido.");
         var clientId = openToken.Claims.First(x => x.Type == "clientId")?.Value ?? throw new ArgumentException("Token inválido.");
 
