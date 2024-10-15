@@ -1,32 +1,35 @@
 ﻿using backend.super_chatbot.Entidades.Requests.Meta;
-using backend.super_chatbot.Results;
 using backend.super_chatbot.Services;
 using Microsoft.AspNetCore.Mvc;
-using System;
+using System.Reflection;
 
 namespace backend.super_chatbot.Apis
 {
     public static class WebHookEndpoints
     {
+        private static string verifyToken = "cfkHGyVupvdOnU89NIxovLCCp";
+
         public static void MapWebhookEndpoints(this IEndpointRouteBuilder routes)
         {
-            routes.MapGet("/webhook", async ([FromServices] ILogger<Program> logger, HttpContext context) =>
-            {
-                var mode = context.Request.Query["hub.mode"];
-                var verifyToken = context.Request.Query["hub.verify_token"];
-                var challenge = context.Request.Query["hub.challenge"];
+            routes.MapGet("/webhook", Hub);
 
-                return (mode == "subscribe" && verifyToken == "cfkHGyVupvdOnU89NIxovLCCp")
-                    ? DefaultResults.CreateOkResult(challenge!)
-                    : DefaultResults.CreateInvalidResult();
-            })
-            .WithName("SubscribeEndpoint");
+            static string Hub(string mode = "", string verify_token = "", string challenge = "")
+            {
+                if(mode=="subscribe" &&  verify_token==verifyToken)
+                    return challenge;
+
+                return string.Empty;
+            }
 
             routes.MapPost("/webhook", async ([FromServices] ILogger<Program> logger, [FromServices] IWebhookService service, MessagesRequest request) =>
             {
-                await service.RedirectMessage(request);                                    
-            })            
+                await service.RedirectMessage(request);
+            })
             .WithName("WebHookInvoke");
         }
     }
+
+    
+
+   
 }
