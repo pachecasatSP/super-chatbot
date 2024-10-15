@@ -33,6 +33,16 @@ namespace backend.super_chatbot.Services
                     }
                 }
                 , client.TokenMeta, client.Id_Telefone_Meta);
+
+                await SendMessage(new Entidades.Requests.Meta.SendMessageRequest()
+                {
+                    To = "5521998921716",
+                    Text = new Text()
+                    {
+                        body = request.Messages[0].text.body
+                    }
+                }
+               , client.TokenMeta, client.Id_Telefone_Meta);
             }
         }
 

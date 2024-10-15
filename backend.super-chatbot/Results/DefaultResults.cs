@@ -18,8 +18,10 @@
             TypedResults.Ok(response);
         public static IResult CreateOkResultEntity<TEntity>(List<TEntity> entityList) =>
             TypedResults.Ok(entityList);
-        public static IResult CreateOkResult(string message) =>
+        public static IResult CreateOkResultMessage(string message) =>
             TypedResults.Ok(new { Mensagem = message });
+        public static IResult CreateOkResult(string message) =>
+           TypedResults.Ok(message);
 
 
     }

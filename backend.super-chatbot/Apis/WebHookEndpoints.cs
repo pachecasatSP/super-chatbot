@@ -17,7 +17,7 @@ namespace backend.super_chatbot.Apis
                 var challenge = context.Request.Query["hub.challenge"];
 
                 return (mode == "subscribe" && verifyToken == "cfkHGyVupvdOnU89NIxovLCCp")
-                    ? DefaultResults.CreateOkResultResponse(challenge)
+                    ? DefaultResults.CreateOkResult(challenge!)
                     : DefaultResults.CreateInvalidResult();
             })
             .WithName("SubscribeEndpoint");
