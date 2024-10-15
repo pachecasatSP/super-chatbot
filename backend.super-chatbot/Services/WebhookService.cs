@@ -21,7 +21,7 @@ namespace backend.super_chatbot.Services
 
         public async Task RedirectMessage(MessagesRequest request)
         {
-            var client = await _clientRepository.GetByPhoneNumber(request.Metadata.display_phone_number);
+            var client = await _clientRepository.GetByPhoneNumber(request.entry[0].changes[0].value.metadata.display_phone_number);
             if (client != null)
             {
                 await SendMessage(new Entidades.Requests.Meta.SendMessageRequest()
@@ -29,7 +29,7 @@ namespace backend.super_chatbot.Services
                     To = "5511954392987",
                     Text = new Text()
                     {
-                        body = request.Messages[0].text.body
+                        body = request.entry[0].changes[0].value.messages[0].text.body
                     }
                 }
                 , client.TokenMeta, client.Id_Telefone_Meta);
@@ -39,7 +39,7 @@ namespace backend.super_chatbot.Services
                     To = "5521998921716",
                     Text = new Text()
                     {
-                        body = request.Messages[0].text.body
+                        body = request.entry[0].changes[0].value.messages[0].text.body
                     }
                 }
                , client.TokenMeta, client.Id_Telefone_Meta);
