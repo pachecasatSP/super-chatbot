@@ -10,7 +10,7 @@ namespace backend.super_chatbot.Apis
     {
         public static void MapWebhookEndpoints(this IEndpointRouteBuilder routes)
         {
-            routes.MapGet("/webhook", ([FromServices] ILogger<Program> logger, HttpContext context) =>
+            routes.MapGet("/webhook", async ([FromServices] ILogger<Program> logger, HttpContext context) =>
             {
                 var mode = context.Request.Query["hub.mode"];
                 var verifyToken = context.Request.Query["hub.verify_token"];
