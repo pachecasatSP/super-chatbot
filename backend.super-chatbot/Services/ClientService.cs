@@ -19,9 +19,9 @@ namespace backend.super_chatbot.Services
         {
             var client = await Repository.CreateClient(new Client()
             {
-                Id_Telefone_Meta = request.Meta_Tel_Id,
-                Nome = request.Nome,
-                NumeroTelefonico = request.NumeroTelefonico
+                MetaPhoneId = request.Meta_Tel_Id,
+                Name = request.Nome,
+                PhoneNumber = request.NumeroTelefonico
             });
 
             var result = new CreateClientResponse()
@@ -38,9 +38,9 @@ namespace backend.super_chatbot.Services
            {
                 new Claim(type: JwtRegisteredClaimNames.Sub, client.Id.ToString()),
                 new Claim(type: JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(type: ClaimTypes.NameIdentifier, client.Nome!.ToString()),
-                new Claim(type: ClaimTypes.MobilePhone, client.NumeroTelefonico),
-                new Claim(type: "metaphoneid", client.Id_Telefone_Meta),
+                new Claim(type: ClaimTypes.NameIdentifier, client.Name!.ToString()),
+                new Claim(type: ClaimTypes.MobilePhone, client.PhoneNumber),
+                new Claim(type: "metaphoneid", client.MetaPhoneId),
                 new Claim(type: "clientId", client.Id.ToString())
             };
 

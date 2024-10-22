@@ -1,4 +1,5 @@
 ﻿using backend.super_chatbot.Entidades.Requests;
+using backend.super_chatbot.Entidades.Requests.Meta;
 using backend.super_chatbot.Results;
 using backend.super_chatbot.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -10,19 +11,48 @@ namespace backend.super_chatbot.Apis
     {
         public static void MapSendMessageEndpoints(this IEndpointRouteBuilder routes)
         {
-            routes.MapPost("/sendmessage", async ([FromServices] ILogger<Program> logger, [FromServices] IWebhookService service, HttpContext context, SendMessageRequest request) =>
+            routes.MapPost("/sendtextmessage", async ([FromServices] ILogger<Program> logger,
+                                                      [FromServices] IMetaService service,
+                                                      HttpContext context, Entidades.Requests.SendTextMessageRequest request) =>
             {
-
-                logger.LogInformation($"recebendo o request: {JsonConvert.SerializeObject(request)}");
-
-                await service.SendMessage(new Entidades.Requests.Meta.SendMessageRequest()
+                await service.SendMessage(new Entidades.Requests.Meta.SendTextMessageRequest()
                 {
-                    Text = new Entidades.Requests.Meta.Text()
+                    Text = new Text()
                     {
                         body = request.Message
                     },
                     To = request.NumeroDestino
-                }, int.Parse(context.Items["clientId"]?.ToString()));
+                }, int.Parse(context.Items["clientId"]?.ToString()!));
+
+
+                return DefaultResults.CreateOkResult();
+            });
+
+            routes.MapPost("/optinMessage", async ([FromServices] ILogger<Program> logger,
+                                                       [FromServices] IMetaService service,
+                                                       HttpContext context, Entidades.Requests.SendTemplateMessageRequest request) =>
+            {
+               
+                await service.SendMessage(new Entidades.Requests.Meta.SendTemplateMessageRequest()
+                {
+                    Template = new Template()
+                    {
+                        Name = "opt_in",
+                        Components = [new HeaderComponent() { Parameters = request.Parameters.Select(x => new TextParameter() { Text = x }).ToArray() }]
+                    },
+                    To = request.NumeroDestino
+                }, int.Parse(context.Items["clientId"]?.ToString()!));
+
+
+                return DefaultResults.CreateOkResult();
+            });
+
+            routes.MapPost("/sendverificationcode", async ([FromServices] ILogger<Program> logger,
+                                                       [FromServices] IMetaService service,
+                                                       HttpContext context, Entidades.Requests.SendMessageRequest request) =>
+            {              
+
+                await service.SendVerificationCodeMessage(request, int.Parse(context.Items["clientId"]?.ToString()!));
 
 
                 return DefaultResults.CreateOkResult();

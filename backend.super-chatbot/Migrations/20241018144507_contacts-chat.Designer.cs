@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backend.super_chatbot;
 
@@ -11,9 +12,11 @@ using backend.super_chatbot;
 namespace backend.super_chatbot.Migrations
 {
     [DbContext(typeof(SuperChatContext))]
-    partial class SuperChatContextModelSnapshot : ModelSnapshot
+    [Migration("20241018144507_contacts-chat")]
+    partial class contactschat
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
