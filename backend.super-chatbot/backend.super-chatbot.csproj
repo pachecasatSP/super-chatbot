@@ -17,6 +17,10 @@
     </PackageReference>
     <PackageReference Include="microsoft.entityframeworkcore.sqlserver" Version="8.0.10" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="serilog" Version="4.0.2" />
+    <PackageReference Include="serilog.extensions.hosting" Version="8.0.0" />
+    <PackageReference Include="serilog.sinks.console" Version="6.0.0" />
+    <PackageReference Include="serilog.sinks.elasticsearch" Version="10.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 

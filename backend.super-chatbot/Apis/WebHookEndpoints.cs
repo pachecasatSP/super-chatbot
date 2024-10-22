@@ -21,9 +21,9 @@ namespace backend.super_chatbot.Apis
                 return string.Empty;
             }
 
-            routes.MapPost("/webhook", async ([FromServices] ILogger<Program> logger, [FromServices] IWebhookService service, MessagesRequest request) =>
+            routes.MapPost("/webhook", async ([FromServices] ILogger<Program> logger, [FromServices] IMetaService service, MessagesRequest request) =>
             {
-                await service.RedirectMessage(request);
+                service.HandleMessage(request);
             })
             .WithName("WebHookInvoke");
         }

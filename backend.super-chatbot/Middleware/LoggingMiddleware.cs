@@ -20,14 +20,18 @@ public class LoggingMiddleware
         await _next(context);
 
         stopwatch.Stop();
+
+        string payload;
+        using var sr = new StreamReader(context.Request.Body);
+        payload = await sr.ReadToEndAsync();
+
         var logDetails = new
         {
             RequestMethod = context.Request.Method,
             RequestPath = context.Request.Path,
+            Payload = payload,
             context.Response.StatusCode,
             stopwatch.ElapsedMilliseconds
         };
-
-       //_logger.Information("Request handled: {@LogDetails}", logDetails);
     }
 }
