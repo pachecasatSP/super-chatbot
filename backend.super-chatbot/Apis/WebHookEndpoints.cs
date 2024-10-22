@@ -1,6 +1,7 @@
 ﻿using backend.super_chatbot.Entidades.Requests.Meta;
 using backend.super_chatbot.Services;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Reflection;
 
 namespace backend.super_chatbot.Apis
@@ -23,6 +24,7 @@ namespace backend.super_chatbot.Apis
 
             routes.MapPost("/webhook", async ([FromServices] ILogger<Program> logger, [FromServices] IMetaService service, MessagesRequest request) =>
             {
+                logger.LogInformation($"incoming request: {JsonConvert.SerializeObject(request)}");
                 service.HandleMessage(request);
             })
             .WithName("WebHookInvoke");
