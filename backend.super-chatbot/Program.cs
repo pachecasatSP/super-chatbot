@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Serilog;
+using Serilog.Events;
+using Serilog.Formatting.Elasticsearch;
 using Serilog.Sinks.Elasticsearch;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,7 +24,6 @@ JsonConvert.DefaultSettings = () => new JsonSerializerSettings
     MaxDepth = 3
 };
 
-
 var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
 var configuration = new ConfigurationBuilder()
@@ -33,27 +34,38 @@ var configuration = new ConfigurationBuilder()
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft.AspNetCore.Hosting", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.AspNetCore.Mvc", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.AspNetCore.Routing", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database", LogEventLevel.Error)
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
     .Enrich.FromLogContext()
-    .WriteTo.Console()
+    .WriteTo.Console(new ElasticsearchJsonFormatter())
     .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(configuration.GetSection("ElasticSearch__Uri").Value!))
     {
         ApiKey = configuration.GetSection("ElasticSearch__ApiKey").Value!,
-        AutoRegisterTemplate = true,  // Cria um template de mapeamento automaticamente no Elasticsearch
-        IndexFormat = "chat-webhook-{0:yyyy.MM.dd}",  // Define o nome do índice com base na data
+        AutoRegisterTemplate = true,
+        IndexFormat = "chat-webhook-{0:yyyy.MM.dd}",
         FailureCallback = (l, e) => Console.WriteLine("Falha ao enviar evento para o Elasticsearch: " + e.Message),
-        EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog // Loga falhas ao tentar enviar eventos
+        EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog
     })
     .CreateLogger();
 
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+builder.Services.AddSerilog();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
 builder.Services.AddAuthentication().AddJwtBearer();
 builder.Services.AddAuthorization();
 
+builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IMetaService, MetaService>();
@@ -90,9 +102,10 @@ app.MapClientEndpoints();
 app.MapWebhookEndpoints();
 app.MapSendMessageEndpoints();
 
-app.UseMiddleware<ErrorHandlingMiddleware>();
-app.UseMiddleware<LoggingMiddleware>();
-app.UseMiddleware<JwtMiddleware>();
+app.UseSerilogRequestLogging();
 
+app.UseMiddleware<LoggingMiddleware>();
+app.UseMiddleware<ErrorHandlingMiddleware>();
+app.UseMiddleware<JwtMiddleware>();
 
 app.Run();

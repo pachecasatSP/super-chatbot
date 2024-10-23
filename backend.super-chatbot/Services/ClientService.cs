@@ -17,7 +17,7 @@ namespace backend.super_chatbot.Services
 
         public async Task<CreateClientResponse> CreateClient(CreateClientRequest request)
         {
-            var client = await Repository.CreateClient(new Client()
+            var client = await Repository.Create(new Client()
             {
                 MetaPhoneId = request.Meta_Tel_Id,
                 Name = request.Nome,

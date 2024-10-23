@@ -1,37 +1,47 @@
-﻿using System.Diagnostics;
+﻿using Serilog;
+using Serilog.Context;
+using System.Diagnostics;
 
 namespace backend.super_chatbot.Middleware;
 
 public class LoggingMiddleware
 {
     private readonly RequestDelegate _next;
-    
+    private readonly Serilog.ILogger _logger;
 
     public LoggingMiddleware(RequestDelegate next)
     {
-        _next = next;        
+        _next = next;
+        _logger = Log.ForContext<LoggingMiddleware>();
     }
 
     public async Task InvokeAsync(HttpContext context)
     {
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
+        if (!context.Request.Body.CanSeek)
+            context.Request.EnableBuffering();
 
-        await _next(context);
+        context.Request.Body.Position = 0;
+        var bodyText = await new StreamReader(context.Request.Body).ReadToEndAsync();
+        context.Request.Body.Position = 0;
 
-        stopwatch.Stop();
-
-        string payload;
-        using var sr = new StreamReader(context.Request.Body);
-        payload = await sr.ReadToEndAsync();
-
-        var logDetails = new
+        using (LogContext.PushProperty("requestBody", bodyText))
         {
-            RequestMethod = context.Request.Method,
-            RequestPath = context.Request.Path,
-            Payload = payload,
-            context.Response.StatusCode,
-            stopwatch.ElapsedMilliseconds
-        };
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+                       
+            await _next(context);
+
+            stopwatch.Stop();
+            var logDetails = new
+            {
+                Method = context.Request.Method,
+                Path = context.Request.Path,
+                context.Response.StatusCode,
+                stopwatch.ElapsedMilliseconds,
+                bodyText
+            };
+
+            _logger.Information("Request handled: {@logDetails}", logDetails);
+        }
     }
 }

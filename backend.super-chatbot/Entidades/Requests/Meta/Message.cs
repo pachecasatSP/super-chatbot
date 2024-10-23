@@ -9,4 +9,5 @@ public class Message
 
     public Button button { get; set; }
     public string type { get; set; }
+    public string message_status { get; set; }
 }

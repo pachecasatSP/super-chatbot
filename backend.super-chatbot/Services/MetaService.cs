@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Requests = backend.super_chatbot.Entidades.Requests;
 using System.Text;
+using backend.super_chatbot.Entidades;
 
 namespace backend.super_chatbot.Services
 {
@@ -13,14 +14,17 @@ namespace backend.super_chatbot.Services
         private WABConfiguration _config;
         private IClientRepository _clientRepository;
         private ILogger<MetaService> _logger;
+        private IContactRepository _contactRepository;
 
         public MetaService(IOptions<WABConfiguration> options,
                               IClientRepository clientRepository,
+                              IContactRepository contactRepository,
                               ILogger<MetaService> logger)
         {
             _config = options.Value;
             _clientRepository = clientRepository;
             _logger = logger;
+            _contactRepository = contactRepository;
         }
 
         public async Task HandleMessage(MessagesRequest request)
@@ -66,14 +70,14 @@ namespace backend.super_chatbot.Services
                , client.TokenOnMeta, client.MetaPhoneId);
             }
         }
-        public async Task<string> SendMessage<T>(T request, int senderId) where T : SendMessageRequest
+        public async Task<(string responseText, Client client)> SendMessage<T>(T request, int senderId) where T : SendMessageRequest
         {
             var client = await _clientRepository.Get(senderId);
 
             if (client is null)
                 throw new ArgumentException("Cliente inválido.");
 
-            return await SendMessage(request, client.TokenOnMeta, client.MetaPhoneId);
+            return (await SendMessage(request, client.TokenOnMeta, client.MetaPhoneId), client);
         }
 
         private async Task<string> SendMessage<T>(T request, string tokenMeta, string idTelefoneMeta) where T : SendMessageRequest
@@ -115,10 +119,33 @@ namespace backend.super_chatbot.Services
                 }
             };
 
-            _logger.LogInformation($"Message:{JsonConvert.SerializeObject(sendVerificationCodeRequest)}");
-
-
             var response = await SendMessage(sendVerificationCodeRequest, senderId);
+            var responseObject = JsonConvert.DeserializeObject<MessageResponse>(response.responseText);
+
+            var client = response.client;
+
+            var chat = new Chat()
+            {
+                ContactId = senderId,
+                VerificationCode = verificationCode.ToString(),
+                VerificationCodeExpiration = DateTime.Now.AddMinutes(90),
+                MetaMessageId = responseObject?.messages[0].id!,
+                CreatedDate = DateTime.Now
+            };
+
+            var contact = await _contactRepository.GetByPhoneNumber(request.NumeroDestino);
+
+            contact ??= new Entidades.Contact()
+            {
+                PhoneNumber = request.NumeroDestino,
+                ClientId = senderId,
+                Name = request.NumeroDestino
+            };
+
+            contact.SetChat(chat);
+
+            client.SetContact(contact);
+            await _clientRepository.Save(client);
         }
     }
 }
