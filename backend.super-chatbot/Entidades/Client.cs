@@ -1,4 +1,6 @@
-﻿namespace backend.super_chatbot.Entidades
+﻿
+
+namespace backend.super_chatbot.Entidades
 {
     public class Client
     {
@@ -9,6 +11,11 @@
         public string TokenOnMeta { get; set; } 
         public string WebHookToken { get; set; }
 
-        public ICollection<Contact> Contacts { get; set; }
+        public ICollection<Contact> Contacts { get; set; } = new List<Contact>();
+
+        internal void SetContact(Contact contact)
+        {
+            Contacts.Add(contact);
+        }
     }
 }

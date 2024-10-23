@@ -1,14 +1,15 @@
-﻿using System.Net;
+﻿using Serilog;
+using System.Net;
 
 public class ErrorHandlingMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly ILogger<ErrorHandlingMiddleware> _logger;
+    private readonly Serilog.ILogger _logger;
 
-    public ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger)
+    public ErrorHandlingMiddleware(RequestDelegate next)
     {
         _next = next ?? throw new ArgumentNullException(nameof(next));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = Log.ForContext<ErrorHandlingMiddleware>();
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -19,11 +20,11 @@ public class ErrorHandlingMiddleware
         }
         catch (ArgumentException ex)
         {
-            _logger.LogInformation(ex.Message);
+            _logger.Information(ex.Message);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Ocorreu um erro inesperado: {ex.Message + ex.StackTrace}");
+            _logger.Error(ex, $"Ocorreu um erro inesperado: {ex.Message + ex.StackTrace}");
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;

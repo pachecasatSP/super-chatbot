@@ -12,7 +12,7 @@ namespace backend.super_chatbot.Repositories
 
         public SuperChatContext Context { get; }
 
-        public async Task<Client> CreateClient(Client entity)
+        public async Task<Client> Create(Client entity)
         {
             Context.Clients.Add(entity);
             await Context.SaveChangesAsync();
@@ -25,5 +25,17 @@ namespace backend.super_chatbot.Repositories
                
         public async Task<Client> GetByPhoneNumber(string display_phone_number) => 
             await Context.Clients.FirstOrDefaultAsync(x => x.PhoneNumber == display_phone_number);
+
+        public async Task<Client> Save(Client entity)
+        {
+            if (entity.Id == 0)
+                await Create(entity);
+
+            Context.Update(entity);
+
+            await Context.SaveChangesAsync();
+
+            return entity;
+        }
     }
 }

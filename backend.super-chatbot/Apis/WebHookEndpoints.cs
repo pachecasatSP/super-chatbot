@@ -23,9 +23,8 @@ namespace backend.super_chatbot.Apis
             }
 
             routes.MapPost("/webhook", async ([FromServices] ILogger<Program> logger, [FromServices] IMetaService service, MessagesRequest request) =>
-            {
-                logger.LogInformation($"incoming request: {JsonConvert.SerializeObject(request)}");
-                service.HandleMessage(request);
+            {               
+               await  service.HandleMessage(request);
             })
             .WithName("WebHookInvoke");
         }
