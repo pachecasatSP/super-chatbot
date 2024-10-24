@@ -1,6 +1,6 @@
 ﻿namespace backend.super_chatbot.Entidades.Requests.Meta;
 
-public abstract class Message
+public class Message
 {
     public string? From { get; set; }
     public string? Id { get; set; }
