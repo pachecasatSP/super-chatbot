@@ -2,6 +2,6 @@
 
 public class Entry
 {
-    public string id { get; set; }
-    public Change[] changes { get; set; }
+    public string Id { get; set; }
+    public Change[] Changes { get; set; }
 }

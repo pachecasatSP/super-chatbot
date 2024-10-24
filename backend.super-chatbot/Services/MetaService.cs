@@ -1,11 +1,12 @@
 ﻿using backend.super_chatbot.Configuration;
+using backend.super_chatbot.Entidades;
 using backend.super_chatbot.Entidades.Requests.Meta;
 using backend.super_chatbot.Repositories;
-using Microsoft.Extensions.Options;
+using backend.super_chatbot.Services.ClientMeta;
+using backend.super_chatbot.Services.WebHookHandlers;
 using Newtonsoft.Json;
+using Serilog;
 using Requests = backend.super_chatbot.Entidades.Requests;
-using System.Text;
-using backend.super_chatbot.Entidades;
 
 namespace backend.super_chatbot.Services
 {
@@ -13,61 +14,40 @@ namespace backend.super_chatbot.Services
     {
         private WABConfiguration _config;
         private IClientRepository _clientRepository;
-        private ILogger<MetaService> _logger;
+        private Serilog.ILogger _logger;
+        private IServiceProvider _serviceProvider;
+        private IClientMeta _clientMeta;
         private IContactRepository _contactRepository;
 
-        public MetaService(IOptions<WABConfiguration> options,
+        public MetaService(IClientMeta clientMeta,
                               IClientRepository clientRepository,
                               IContactRepository contactRepository,
-                              ILogger<MetaService> logger)
+                              IServiceProvider serviceProvider)
         {
-            _config = options.Value;
-            _clientRepository = clientRepository;
-            _logger = logger;
+           
+            _clientRepository = clientRepository;            
             _contactRepository = contactRepository;
+            _logger = Log.ForContext<MetaService>();
+            _serviceProvider = serviceProvider;
+            _clientMeta = clientMeta;
         }
 
         public async Task HandleMessage(MessagesRequest request)
         {
-            if (request.entry[0].changes[0].field == "messages")
+            if (request.Entry[0].Changes[0].Field == "messages")
             {
-                var message = request.entry[0].changes[0].value.messages[0];
-                if (message.type == "text")
-                    await RedirectMessage(request.entry[0].changes[0].value.metadata.display_phone_number, message.text.body);
-                else if (message.type == "button")
-                    await HandleButtonClick(message);
-            }
-        }
+                var message = request.Entry[0].Changes[0].Value.Messages[0]!;
 
-        private async Task HandleButtonClick(Message message)
-        {
-            throw new NotImplementedException();
-        }
-
-        private async Task RedirectMessage(string senderPhoneNumber, string message)
-        {
-            var client = await _clientRepository.GetByPhoneNumber(senderPhoneNumber);
-            if (client != null)
-            {
-                await SendMessage(new SendTextMessageRequest()
+                if (message == null)
                 {
-                    To = "5511954392987",
-                    Text = new Text()
-                    {
-                        body = message
-                    }
+                    _logger.Information("null webhook message handled {@request}", request);
+                    return;
                 }
-                , client.TokenOnMeta, client.MetaPhoneId);
 
-                await SendMessage(new SendTextMessageRequest()
-                {
-                    To = "5521998921716",
-                    Text = new Text()
-                    {
-                        body = message
-                    }
-                }
-               , client.TokenOnMeta, client.MetaPhoneId);
+                var handler = _serviceProvider.GetKeyedService<IWebHookHandler>(message.Type)
+                    ?? throw new ArgumentException($"Tipo: {message.Type} não possui um handler.");
+
+                await handler.HandleIncomingMessage(request);
             }
         }
         public async Task<(string responseText, Client client)> SendMessage<T>(T request, int senderId) where T : SendMessageRequest
@@ -77,24 +57,7 @@ namespace backend.super_chatbot.Services
             if (client is null)
                 throw new ArgumentException("Cliente inválido.");
 
-            return (await SendMessage(request, client.TokenOnMeta, client.MetaPhoneId), client);
-        }
-
-        private async Task<string> SendMessage<T>(T request, string tokenMeta, string idTelefoneMeta) where T : SendMessageRequest
-        {
-            using var httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri(_config.BaseAddress);
-            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenMeta);
-
-
-            var response = await httpClient.PostAsync(string.Format(_config.MessagesEndpoint, idTelefoneMeta), new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json"));
-
-            var responseText = await response.Content.ReadAsStringAsync();
-
-            if (!response.IsSuccessStatusCode)
-                throw new Exception(responseText);
-
-            return responseText;
+            return (await _clientMeta.SendMessage(request, client), client);
         }
 
         public async Task SendVerificationCodeMessage(Requests.SendMessageRequest request, int senderId)
@@ -129,7 +92,7 @@ namespace backend.super_chatbot.Services
                 ContactId = senderId,
                 VerificationCode = verificationCode.ToString(),
                 VerificationCodeExpiration = DateTime.Now.AddMinutes(90),
-                MetaMessageId = responseObject?.messages[0].id!,
+                MetaMessageId = responseObject?.messages[0].Id!,
                 CreatedDate = DateTime.Now
             };
 

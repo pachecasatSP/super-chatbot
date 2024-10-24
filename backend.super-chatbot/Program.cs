@@ -4,6 +4,8 @@ using backend.super_chatbot.Configuration;
 using backend.super_chatbot.Middleware;
 using backend.super_chatbot.Repositories;
 using backend.super_chatbot.Services;
+using backend.super_chatbot.Services.ClientMeta;
+using backend.super_chatbot.Services.WebHookHandlers;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -65,10 +67,15 @@ builder.Services.AddCors();
 builder.Services.AddAuthentication().AddJwtBearer();
 builder.Services.AddAuthorization();
 
+builder.Services.AddScoped<IClientMeta, ClientMeta>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IMetaService, MetaService>();
+
+builder.Services.AddKeyedScoped<IWebHookHandler, TextWebhookHandler>("text");
+builder.Services.AddKeyedScoped<IWebHookHandler, ButtonWebhookHandler>("button");
+builder.Services.AddKeyedScoped<IWebHookHandler, DocumentWebhookHandler>("document");
 
 builder.Services.Configure<WABConfiguration>(configuration.GetSection(WABConfiguration.WABOptions));
 

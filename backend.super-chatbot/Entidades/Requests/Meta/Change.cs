@@ -2,6 +2,6 @@
 
 public class Change
 {
-    public Value value { get; set; }
-    public string field { get; set; }
+    public Value Value { get; set; }
+    public string Field { get; set; }
 }

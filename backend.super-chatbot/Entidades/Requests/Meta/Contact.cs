@@ -2,6 +2,6 @@
 
 public class Contact
 {
-    public Profile profile { get; set; }
-    public string wa_id { get; set; }
+    public Profile Profile { get; set; }
+    public string Wa_id { get; set; }
 }
