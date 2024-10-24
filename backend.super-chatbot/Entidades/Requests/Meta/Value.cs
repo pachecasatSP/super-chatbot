@@ -2,8 +2,8 @@
 
 public class Value
 {
-    public string messaging_product { get; set; }
-    public Metadata metadata { get; set; }
-    public Contact[] contacts { get; set; }
-    public Message[] messages { get; set; }
+    public string Messaging_product { get; set; }
+    public Metadata Metadata { get; set; }
+    public Contact[] Contacts { get; set; }
+    public Message[] Messages { get; set; }
 }

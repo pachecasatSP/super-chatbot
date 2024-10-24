@@ -2,6 +2,6 @@
 
 public class Metadata
 {
-    public string display_phone_number { get; set; }
-    public string phone_number_id { get; set; }
+    public string? Display_phone_number { get; set; }
+    public string? Phone_number_id { get; set; }
 }

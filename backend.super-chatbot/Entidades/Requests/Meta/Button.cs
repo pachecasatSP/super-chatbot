@@ -2,6 +2,6 @@
 
 public class Button
 {
-    public string payload { get; set; }
-    public string text { get; set; }
+    public string? Payload { get; set; }
+    public string? Text { get; set; }
 }

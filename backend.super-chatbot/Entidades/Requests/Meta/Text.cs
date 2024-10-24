@@ -2,5 +2,5 @@
 
 public class Text
 {
-    public string body { get; set; }
+    public string? Body { get; set; }
 }
