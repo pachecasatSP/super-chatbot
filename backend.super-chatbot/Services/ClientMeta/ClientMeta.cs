@@ -3,6 +3,7 @@ using backend.super_chatbot.Entidades;
 using backend.super_chatbot.Entidades.Requests.Meta;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Serilog;
 using System.Text;
 
 namespace backend.super_chatbot.Services.ClientMeta
@@ -10,10 +11,12 @@ namespace backend.super_chatbot.Services.ClientMeta
     public class ClientMeta : IClientMeta
     {
         private WABConfiguration _config;
+        private Serilog.ILogger _logger;
 
         public ClientMeta(IOptions<WABConfiguration> options)
         {
             _config = options.Value;
+            _logger = Log.ForContext<ClientMeta>();
         }
 
         public Task<Stream> DownloadMedia(string url)
@@ -30,6 +33,10 @@ namespace backend.super_chatbot.Services.ClientMeta
             var response = await httpClient.GetAsync($"/media/{mediaId}");
             var responseText = await response.Content.ReadAsStringAsync();
 
+            _logger.Information("responseText {@responseText}", responseText);
+            if (!response.IsSuccessStatusCode)
+                return null;
+
             return JsonConvert.DeserializeObject<MediaResponse>(responseText)!;
         }
 
@@ -40,6 +47,9 @@ namespace backend.super_chatbot.Services.ClientMeta
             httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", client.TokenOnMeta);
 
             var response = await httpClient.GetStreamAsync(url);
+
+            
+
             return response;
         }
 

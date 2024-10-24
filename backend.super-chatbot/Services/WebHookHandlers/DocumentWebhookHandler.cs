@@ -28,6 +28,12 @@ namespace backend.super_chatbot.Services.WebHookHandlers
 
             var document = await _clientMeta.GetMedia(documentInfo.Id!, client);
 
+            if(document is null)
+            {
+                _logger.Information("DocumentInfo vazio");
+                return;
+            }
+
             _logger.Information("Document details {@documentDetails}", document);
 
             var stream = await _clientMeta.DownloadMedia(document.Url!, client);

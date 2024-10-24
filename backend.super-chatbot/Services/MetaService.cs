@@ -24,8 +24,8 @@ namespace backend.super_chatbot.Services
                               IContactRepository contactRepository,
                               IServiceProvider serviceProvider)
         {
-           
-            _clientRepository = clientRepository;            
+
+            _clientRepository = clientRepository;
             _contactRepository = contactRepository;
             _logger = Log.ForContext<MetaService>();
             _serviceProvider = serviceProvider;
@@ -36,7 +36,8 @@ namespace backend.super_chatbot.Services
         {
             if (request.Entry[0].Changes[0].Field == "messages")
             {
-                var message = request.Entry[0].Changes[0].Value.Messages[0]!;
+                var message = request.GetMessage();
+
 
                 if (message == null)
                 {
@@ -47,6 +48,8 @@ namespace backend.super_chatbot.Services
                 var handler = _serviceProvider.GetKeyedService<IWebHookHandler>(message.Type)
                     ?? throw new ArgumentException($"Tipo: {message.Type} não possui um handler.");
 
+                var senderPhoneNumber = request.GetSenderPhoneNumber();
+                await MarkMessageReadAsync(message.Id!, senderPhoneNumber);
                 await handler.HandleIncomingMessage(request);
             }
         }
@@ -109,6 +112,18 @@ namespace backend.super_chatbot.Services
 
             client.SetContact(contact);
             await _clientRepository.Save(client);
+        }
+
+        private async Task MarkMessageReadAsync(string messageId, string senderPhoneNumber)
+        {
+            var client = await _clientRepository.GetByPhoneNumber(senderPhoneNumber);
+
+            var request = new SetAsReadRequest()
+            {
+                Message_id = messageId
+            };
+
+            await _clientMeta.SendMessage(request, client);
         }
     }
 }
