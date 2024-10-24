@@ -19,7 +19,7 @@ namespace backend.super_chatbot.Apis
                 {
                     Text = new Text()
                     {
-                        body = request.Message
+                        Body = request.Message
                     },
                     To = request.NumeroDestino
                 }, int.Parse(context.Items["clientId"]?.ToString()!));
@@ -48,7 +48,7 @@ namespace backend.super_chatbot.Apis
             });
 
             routes.MapPost("/sendverificationcode", async ([FromServices] ILogger<Program> logger,
-                                                       [FromServices] IMetaService service,
+                                                           [FromServices] IMetaService service,
                                                        HttpContext context, Entidades.Requests.SendMessageRequest request) =>
             {              
 
