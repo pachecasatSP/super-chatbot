@@ -28,7 +28,7 @@ namespace backend.super_chatbot.Apis
                 return DefaultResults.CreateOkResult();
             });
 
-            routes.MapPost("/optinMessage", async ([FromServices] ILogger<Program> logger,
+            routes.MapPost("/sendoptinMessage", async ([FromServices] ILogger<Program> logger,
                                                        [FromServices] IMetaService service,
                                                        HttpContext context, Entidades.Requests.SendTemplateMessageRequest request) =>
             {
