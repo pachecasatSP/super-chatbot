@@ -6,5 +6,6 @@ public class Value
     public Metadata Metadata { get; set; }
     public Contact[] Contacts { get; set; }
     public Message[] Messages { get; set; }
-    public MessageStatus[] Statuses { get; set; }   
+    public MessageStatus[] Statuses { get; set; }
+    public InteractiveResponse Interactive { get; set; }
 }

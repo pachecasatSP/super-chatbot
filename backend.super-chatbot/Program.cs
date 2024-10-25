@@ -76,6 +76,7 @@ builder.Services.AddScoped<IMetaService, MetaService>();
 builder.Services.AddKeyedScoped<IWebHookHandler, TextWebhookHandler>("text");
 builder.Services.AddKeyedScoped<IWebHookHandler, ButtonWebhookHandler>("button");
 builder.Services.AddKeyedScoped<IWebHookHandler, DocumentWebhookHandler>("document");
+builder.Services.AddKeyedScoped<IWebHookHandler, InteractiveWebhookHandler>("interactive");
 
 builder.Services.Configure<WABConfiguration>(configuration.GetSection(WABConfiguration.WABOptions));
 

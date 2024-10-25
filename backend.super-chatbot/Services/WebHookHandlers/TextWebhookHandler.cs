@@ -6,7 +6,6 @@ namespace backend.super_chatbot.Services.WebHookHandlers
 {
     public class TextWebhookHandler : IWebHookHandler
     {
-        private List<string> _distributionList = ["5511954392987", "5521998921716"];
 
         private IClientMeta _clientMeta;
         private IClientRepository _clientRepository;
@@ -19,22 +18,31 @@ namespace backend.super_chatbot.Services.WebHookHandlers
         }
         public async Task HandleIncomingMessage(MessagesRequest message)
         {
-            var senderPhoneNumber = message.GetSenderPhoneNumber();
-            var sentMessage = message.GetText().Body!;
-
+            var senderPhoneNumber = message.GetSenderPhoneNumber();            
             var client = await _clientRepository.GetByPhoneNumber(senderPhoneNumber);
             if (client != null)
             {
-                foreach (var item in _distributionList)
-                    await _clientMeta.SendMessage(new SendTextMessageRequest()
-                    {
-                        To = item,
-                        Text = new Text()
+
+                var from = message.GetFrom();
+
+                if (string.IsNullOrEmpty(from))
+                    return;
+
+                await _clientMeta.SendMessage(new SendIteractiveMessageRequest()
+                {
+                    To = from,
+                     Iteractive = new InteractiveMessageModel()
+                     {
+                        Body = new Body() { Text = $"Olá {message.GetContact().Profile.Name}. Seja bem-vindo a nossa ferramenta!\r\nAbaixo você encontra as opções disponíveis." },
+                        Footer = new Footer() { Text = $"Selecione a opção desejada."},
+                        Action = new InteractiveAction()
                         {
-                            Body = sentMessage
+                            Buttons = [new ActionButton() {  Reply = new Reply(){Id = "download-template",Title = "Baixar Template"} },
+                                       new ActionButton() {  Reply = new Reply(){Id = "upload-sheet",Title = "Enviar planilha"} }]
                         }
-                    }
-                , client);
+                     }
+                }
+            , client);
 
             }
         }
