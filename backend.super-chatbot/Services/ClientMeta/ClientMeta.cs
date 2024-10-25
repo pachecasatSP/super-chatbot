@@ -44,9 +44,9 @@ namespace backend.super_chatbot.Services.ClientMeta
 
             var response = await httpClient.GetAsync(url);
 
-            _logger.Information("media response {@response}", await response.Content.ReadAsStringAsync());
-
-            return new MemoryStream();
+            var responseByteArray = await response.Content.ReadAsByteArrayAsync();
+            
+            return new MemoryStream(responseByteArray);
         }
 
         public async Task<string> SendMessage<T>(T request, Client client) where T : SendMessageRequest
