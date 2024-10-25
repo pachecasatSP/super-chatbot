@@ -44,7 +44,7 @@ namespace backend.super_chatbot.Services.ClientMeta
 
             var response = await httpClient.GetAsync(url);
 
-            _logger.Information("media response {@response}", response);
+            _logger.Information("media response {@response}", await response.Content.ReadAsStringAsync());
 
             return new MemoryStream();
         }
