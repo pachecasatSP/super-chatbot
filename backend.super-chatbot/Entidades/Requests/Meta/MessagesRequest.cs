@@ -12,11 +12,14 @@ public class MessagesRequest
         Entry[0].Changes[0].Value.Messages[0]?.Button!;
 
     internal Message GetMessage() =>
-        Entry[0].Changes[0].Value.Messages[0]!;
+        Entry[0].Changes[0].Value.Messages?[0]!;
 
     internal Text GetText() =>
        Entry[0].Changes[0].Value.Messages[0].Text!;
 
     internal Document GetDocument() =>
        Entry[0].Changes[0].Value.Messages[0].Document;
+
+    internal MessageStatus[] GetStatuses() =>
+        Entry[0].Changes[0].Value?.Statuses!;
 }
