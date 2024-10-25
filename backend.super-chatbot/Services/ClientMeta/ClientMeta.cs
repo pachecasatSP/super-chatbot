@@ -4,6 +4,7 @@ using backend.super_chatbot.Entidades.Requests.Meta;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Serilog;
+using System.Net.Http.Headers;
 using System.Text;
 
 namespace backend.super_chatbot.Services.ClientMeta
@@ -18,17 +19,12 @@ namespace backend.super_chatbot.Services.ClientMeta
             _config = options.Value;
             _logger = Log.ForContext<ClientMeta>();
         }
-
-        public Task<Stream> DownloadMedia(string url)
-        {
-            throw new NotImplementedException();
-        }
-
+       
         public async Task<MediaResponse> GetMedia(string mediaId, Client client)
         {
             using var httpClient = new HttpClient();
             httpClient.BaseAddress = new Uri(_config.BaseAddress);
-            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", client.TokenOnMeta);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", client.TokenOnMeta);
 
             var response = await httpClient.GetAsync($"/{mediaId}");
             var responseText = await response.Content.ReadAsStringAsync();
@@ -44,20 +40,18 @@ namespace backend.super_chatbot.Services.ClientMeta
         {
             using var httpClient = new HttpClient();
             httpClient.BaseAddress = new Uri(_config.BaseAddress);
-            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", client.TokenOnMeta);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", client.TokenOnMeta);
 
-            var response = await httpClient.GetStreamAsync(url);
-
-            
-
-            return response;
+            var response = await httpClient.GetAsync(url);
+                       
+            return new MemoryStream();
         }
 
         public async Task<string> SendMessage<T>(T request, Client client) where T : SendMessageRequest
         {
             using var httpClient = new HttpClient();
             httpClient.BaseAddress = new Uri(_config.BaseAddress);
-            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", client.TokenOnMeta);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", client.TokenOnMeta);
 
             var response = await httpClient.PostAsync(string.Format(_config.MessagesEndpoint, client.MetaPhoneId), new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json"));
 
