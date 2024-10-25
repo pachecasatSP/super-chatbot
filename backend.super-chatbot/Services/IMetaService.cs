@@ -7,7 +7,7 @@ namespace backend.super_chatbot.Services
     public interface IMetaService
     {
         Task<(string responseText, Client client)> SendMessage<T>(T request, int senderId) where T : SendMessageRequest;
-        Task HandleMessage(MessagesRequest request);
+        Task HandleWebhookMessage(MessagesRequest request);
         Task SendVerificationCodeMessage(Requests.SendMessageRequest  request, int senderId);
     }
 }
