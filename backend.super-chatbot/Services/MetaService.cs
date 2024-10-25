@@ -39,7 +39,10 @@ namespace backend.super_chatbot.Services
                 var message = request.GetMessage();
                 if (message is null)
                 {
-                    _logger.Information("null webhook message handled {@request}", request);
+                    var statuses = request.GetStatuses();
+                    if (statuses != null)
+                        _logger.Information("statuses received {@statuses}", statuses);
+
                     return;
                 }
 
