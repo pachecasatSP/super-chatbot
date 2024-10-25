@@ -36,12 +36,9 @@ namespace backend.super_chatbot.Services.WebHookHandlers
 
             _logger.Information("Document details {@documentDetails}", document);
 
-            var stream = await _clientMeta.DownloadMedia(document.Url!, client);
+            var result = await _clientMeta.DownloadMedia(document.Url!, client);
 
-            using var sr = new StreamReader(stream);
-            stream.Position = 0;
-            var streamText =  await sr.ReadToEndAsync();
-            _logger.Information("Received {@stream}", streamText);  
+            _logger.Information("Received {@result}", result);  
 
         }
     }

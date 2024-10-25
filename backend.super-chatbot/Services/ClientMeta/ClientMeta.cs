@@ -38,15 +38,14 @@ namespace backend.super_chatbot.Services.ClientMeta
 
         public async Task<Stream> DownloadMedia(string url, Client client)
         {
-            using var httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri(_config.BaseAddress);
+            using var httpClient = new HttpClient();            
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", client.TokenOnMeta);
-
+            httpClient.DefaultRequestHeaders.Add("User-Agent", "PostmanRuntime/7.42.0");
             var response = await httpClient.GetAsync(url);
+            var result = await response.Content.ReadAsStreamAsync();
+            response.EnsureSuccessStatusCode();
 
-            var responseByteArray = await response.Content.ReadAsByteArrayAsync();
-            
-            return new MemoryStream(responseByteArray);
+            return result ;
         }
 
         public async Task<string> SendMessage<T>(T request, Client client) where T : SendMessageRequest
