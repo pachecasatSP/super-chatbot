@@ -2,20 +2,20 @@
 {
     public class SendTemplateMessageRequest : SendMessageRequest
     {
-        public string Type { get { return "template"; } }
+        public string? Type { get { return "template"; } }
 
-        public Template Template { get; set; }
+        public Template? Template { get; set; }
 
     }
 
     public class Template
     {
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
-        public Language Language { get; set; } = new Language();
+        public Language? Language { get; set; } = new Language();
 
-        public Component[] Components { get; set; }
+        public Component[]? Components { get; set; }
        
     }
         

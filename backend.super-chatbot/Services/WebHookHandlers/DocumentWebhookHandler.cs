@@ -34,6 +34,15 @@ namespace backend.super_chatbot.Services.WebHookHandlers
                 return;
             }
 
+            await _clientMeta.SendMessage(new SendTextMessageRequest()
+            {
+                To = message.GetFrom(),
+                Text = new Text()
+                {
+                    Body = $"Recebemos o arquivo {documentInfo.Filename} você será notificado quando finalizarmos o processamneto."
+                }
+            }, client);
+
             _logger.Information("Document details {@documentDetails}", document);
 
             var result = await _clientMeta.DownloadMedia(document.Url!, client);

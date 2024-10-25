@@ -13,4 +13,6 @@ public class Message
     public Button Button { get; set; }
 
     public Document Document { get; set; }
+
+    public InteractiveResponse Interactive { get; set; }
 }

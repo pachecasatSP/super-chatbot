@@ -2,7 +2,7 @@
 {
     public class InteractiveMessageModel
     {
-        public string? Type { get; set; }
+        public string? Type { get; set; } = "button";
         public Header? Header { get; set; }
         public Body? Body { get; set; }
         public Footer? Footer { get; set; }
