@@ -51,9 +51,9 @@ namespace backend.super_chatbot.Services
                 var handler = _serviceProvider.GetKeyedService<IWebHookHandler>(message.Type)
                     ?? throw new ArgumentException($"Tipo: {message.Type} não possui um handler.");
 
-                var senderPhoneNumber = request.GetSenderPhoneNumber();
-                await MarkMessageReadAsync(message.Id!, senderPhoneNumber);
+                var senderPhoneNumber = request.GetSenderPhoneNumber();              
                 await handler.HandleIncomingMessage(request);
+                //await MarkMessageReadAsync(message.Id!, senderPhoneNumber);
             }
         }
         public async Task<(string responseText, Client client)> SendMessage<T>(T request, int senderId) where T : SendMessageRequest
