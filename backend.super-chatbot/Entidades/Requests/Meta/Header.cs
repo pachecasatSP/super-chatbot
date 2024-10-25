@@ -2,8 +2,8 @@
 {
     public class Header
     {
-        public string? Type { get; set; } = "Image";
-        public Image? Image { get; set; }
+        public string? Type { get; set; } = "image";
+        public Image Image { get; set; } = new Image();
     }
 }
 
