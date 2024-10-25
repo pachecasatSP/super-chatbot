@@ -3,7 +3,7 @@
     public class SendIteractiveMessageRequest : SendMessageRequest
     {
         public string Type { get { return "interactive"; } }
-        public InteractiveMessageModel? Iteractive { get; set; }
+        public InteractiveMessageModel? Interactive { get; set; }
     }
 }
 

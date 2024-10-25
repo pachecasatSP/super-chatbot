@@ -47,7 +47,7 @@ namespace backend.super_chatbot.Services
                     return;
                 }
 
-                await MarkMessageReadAsync(message.Id!, request.GetSenderPhoneNumber());
+                //await MarkMessageReadAsync(message.Id!, request.GetSenderPhoneNumber());
                 var handler = _serviceProvider.GetKeyedService<IWebHookHandler>(message.Type)
                     ?? throw new ArgumentException($"Tipo: {message.Type} não possui um handler.");
                 

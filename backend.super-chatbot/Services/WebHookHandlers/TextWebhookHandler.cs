@@ -18,31 +18,31 @@ namespace backend.super_chatbot.Services.WebHookHandlers
         }
         public async Task HandleIncomingMessage(MessagesRequest message)
         {
-            var senderPhoneNumber = message.GetSenderPhoneNumber();            
+            var senderPhoneNumber = message.GetSenderPhoneNumber();
             var client = await _clientRepository.GetByPhoneNumber(senderPhoneNumber);
             if (client != null)
             {
-
                 var from = message.GetFrom();
 
                 if (string.IsNullOrEmpty(from))
                     return;
 
-                await _clientMeta.SendMessage(new SendIteractiveMessageRequest()
+                var request = new SendIteractiveMessageRequest()
                 {
                     To = from,
-                     Iteractive = new InteractiveMessageModel()
-                     {
+                    Interactive = new InteractiveMessageModel()
+                    {
                         Body = new Body() { Text = $"Olá {message.GetContact().Profile.Name}. Seja bem-vindo a nossa ferramenta!\r\nAbaixo você encontra as opções disponíveis." },
-                        Footer = new Footer() { Text = $"Selecione a opção desejada."},
+                        Footer = new Footer() { Text = $"Selecione a opção desejada." },
                         Action = new InteractiveAction()
                         {
                             Buttons = [new ActionButton() {  Reply = new Reply(){Id = "download-template",Title = "Baixar Template"} },
                                        new ActionButton() {  Reply = new Reply(){Id = "upload-sheet",Title = "Enviar planilha"} }]
                         }
-                     }
-                }
-            , client);
+                    }
+                };
+
+                await _clientMeta.SendMessage(request, client);
 
             }
         }

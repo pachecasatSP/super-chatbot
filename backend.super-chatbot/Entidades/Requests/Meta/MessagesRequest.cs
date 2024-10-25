@@ -30,5 +30,5 @@ public class MessagesRequest
         Entry[0].Changes[0].Value.Contacts?[0]!;
 
     internal InteractiveResponse GetInteractiveResponse() =>
-        Entry[0].Changes[0].Value?.Interactive!;
+        Entry[0].Changes[0].Value?.Messages?[0].Interactive!;
 }

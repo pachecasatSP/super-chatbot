@@ -2,6 +2,7 @@
 using backend.super_chatbot.Entidades.Requests.Meta;
 using backend.super_chatbot.Repositories;
 using backend.super_chatbot.Services.ClientMeta;
+using Serilog;
 
 namespace backend.super_chatbot.Services.WebHookHandlers
 {
@@ -9,20 +10,22 @@ namespace backend.super_chatbot.Services.WebHookHandlers
     {
         private IClientMeta _clientMeta;
         private IClientRepository _clientRepository;
+        private Serilog.ILogger _logger;
 
         public InteractiveWebhookHandler(IClientMeta clientMeta,
                                          IClientRepository clientRepository)
         {
             _clientMeta = clientMeta;
             _clientRepository = clientRepository;
+            _logger = Log.ForContext<InteractiveWebhookHandler>();
         }
 
         public async Task HandleIncomingMessage(MessagesRequest message)
         {
             var payload = message.GetInteractiveResponse();
             if (payload is null)
-                return;
-
+                _logger.Information("Propriedade 'interactive' veio nula.");
+            
             var client = await _clientRepository.GetByPhoneNumber(message.GetSenderPhoneNumber());
             switch (payload.Button_reply.Id)
             {
@@ -59,6 +62,7 @@ namespace backend.super_chatbot.Services.WebHookHandlers
                 Document = new DocumentDetails()
                 {
                      Id = "2813583085488085",
+                     Filename ="template.txt",
                      Caption = $"Prontinho {message.GetContact().Profile.Name}, \n\raqui está o template de arquivo que precisa ser preenchido."
                 }
             }, client);

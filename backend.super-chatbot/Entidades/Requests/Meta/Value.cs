@@ -7,5 +7,5 @@ public class Value
     public Contact[] Contacts { get; set; }
     public Message[] Messages { get; set; }
     public MessageStatus[] Statuses { get; set; }
-    public InteractiveResponse Interactive { get; set; }
+   
 }
