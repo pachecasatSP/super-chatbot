@@ -43,7 +43,9 @@ namespace backend.super_chatbot.Services.ClientMeta
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", client.TokenOnMeta);
 
             var response = await httpClient.GetAsync(url);
-                       
+
+            _logger.Information("media response {@response}", response);
+
             return new MemoryStream();
         }
 
