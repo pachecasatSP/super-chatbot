@@ -32,14 +32,12 @@ namespace backend.super_chatbot.Services
             _clientMeta = clientMeta;
         }
 
-        public async Task HandleMessage(MessagesRequest request)
+        public async Task HandleWebhookMessage(MessagesRequest request)
         {
             if (request.Entry[0].Changes[0].Field == "messages")
             {
                 var message = request.GetMessage();
-
-
-                if (message == null)
+                if (message is null)
                 {
                     _logger.Information("null webhook message handled {@request}", request);
                     return;
