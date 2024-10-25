@@ -36,13 +36,15 @@ namespace backend.super_chatbot.Services
         {
             if (request.Entry[0].Changes[0].Field == "messages")
             {
-                var message = request.GetMessage();
+                var message = request.GetMessage();                
                 if (message is null)
                 {
                     var statuses = request.GetStatuses();
                     if (statuses != null)
+                    {                        
+                        await MarkMessageReadAsync(statuses[0].Id, request.GetSenderPhoneNumber());
                         _logger.Information("statuses received {@statuses}", statuses);
-
+                    }                     
                     return;
                 }
 

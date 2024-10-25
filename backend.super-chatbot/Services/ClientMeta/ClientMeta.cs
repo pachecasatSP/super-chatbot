@@ -30,7 +30,7 @@ namespace backend.super_chatbot.Services.ClientMeta
             httpClient.BaseAddress = new Uri(_config.BaseAddress);
             httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", client.TokenOnMeta);
 
-            var response = await httpClient.GetAsync($"/media/{mediaId}");
+            var response = await httpClient.GetAsync($"/{mediaId}");
             var responseText = await response.Content.ReadAsStringAsync();
 
             _logger.Information("responseText {@responseText}", responseText);
