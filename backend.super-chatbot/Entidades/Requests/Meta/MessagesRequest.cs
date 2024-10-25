@@ -22,4 +22,13 @@ public class MessagesRequest
 
     internal MessageStatus[] GetStatuses() =>
         Entry[0].Changes[0].Value?.Statuses!;
+
+    internal string GetFrom() =>
+        Entry[0].Changes[0].Value.Messages?[0].From!;
+
+    internal Contact GetContact() =>
+        Entry[0].Changes[0].Value.Contacts?[0]!;
+
+    internal InteractiveResponse GetInteractiveResponse() =>
+        Entry[0].Changes[0].Value?.Interactive!;
 }

@@ -2,21 +2,19 @@
 {
     public class SendMessageRequest
     {
-        public string Messaging_product { get { return "whatsapp"; } }
-        public string To { get; set; }
+        public string? Messaging_product { get { return "whatsapp"; } }
+        public string? To { get; set; }
         public string recipient_type { get { return "individual"; } }
-        public Context Context { get; set; }
+        public Context? Context { get; set; }
     }
 
     public class Context
     {
-        public string Message_id { get; set; }
+        public string? Message_id { get; set; }
     }
 
-    public class SendTextMessageRequest : SendMessageRequest
-    {
-        public string Type { get { return "text"; } }
-        public Text Text { get; set; }
-    }
 }
+
+
+
 

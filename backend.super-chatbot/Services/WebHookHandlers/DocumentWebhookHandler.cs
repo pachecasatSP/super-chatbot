@@ -28,7 +28,7 @@ namespace backend.super_chatbot.Services.WebHookHandlers
 
             var document = await _clientMeta.GetMedia(documentInfo.Id!, client);
 
-            if(document is null)
+            if (document is null)
             {
                 _logger.Information("DocumentInfo vazio");
                 return;
@@ -38,8 +38,17 @@ namespace backend.super_chatbot.Services.WebHookHandlers
 
             var result = await _clientMeta.DownloadMedia(document.Url!, client);
 
-            _logger.Information("Received {@result}", result);  
+            if (document.Mime_type == "text/plain")
+            {
+                var resultText = ReadPlainText(result);
+                _logger.Information("Received {@result}", result);
+            }
+        }
 
+        private object ReadPlainText(Stream result)
+        {
+            using var sr = new StreamReader(result);
+            return sr.ReadToEnd();
         }
     }
 }
