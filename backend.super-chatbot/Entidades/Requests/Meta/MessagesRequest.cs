@@ -5,7 +5,7 @@ public class MessagesRequest
 {
     public Entry[] Entry { get; set; }
 
-    public string GetSenderPhoneNumber() =>
+    public string GetDestinationPhoneNumber() =>
         Entry[0].Changes[0].Value.Metadata?.Display_phone_number!;
 
     internal Button GetButton() =>

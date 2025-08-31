@@ -2,8 +2,8 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.super_chatbot;
 
 #nullable disable
@@ -18,33 +18,33 @@ namespace backend.super_chatbot.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.10")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("backend.super_chatbot.Entidades.Chat", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ContactId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("MetaMessageId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("VerificationCode")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("VerificationCodeExpiration")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -57,29 +57,27 @@ namespace backend.super_chatbot.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FriendlyName")
+                        .HasColumnType("text");
 
                     b.Property<string>("MetaPhoneId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("TokenOnMeta")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("WebHookToken")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -90,20 +88,20 @@ namespace backend.super_chatbot.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ClientId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -121,6 +119,84 @@ namespace backend.super_chatbot.Migrations
                         .IsRequired();
 
                     b.Navigation("Contact");
+                });
+
+            modelBuilder.Entity("backend.super_chatbot.Entidades.Client", b =>
+                {
+                    b.OwnsOne("backend.super_chatbot.Entidades.Flow", "Flow", b1 =>
+                        {
+                            b1.Property<int>("ClientId")
+                                .HasColumnType("integer");
+
+                            b1.HasKey("ClientId");
+
+                            b1.ToTable("Clients");
+
+                            b1.ToJson("Flow");
+
+                            b1.WithOwner("Client")
+                                .HasForeignKey("ClientId");
+
+                            b1.OwnsMany("backend.super_chatbot.Entidades.Step", "Steps", b2 =>
+                                {
+                                    b2.Property<int>("FlowClientId")
+                                        .HasColumnType("integer");
+
+                                    b2.Property<int>("Id")
+                                        .ValueGeneratedOnAdd()
+                                        .HasColumnType("integer");
+
+                                    b2.Property<int>("NextStep")
+                                        .HasColumnType("integer");
+
+                                    b2.Property<string>("Number")
+                                        .HasColumnType("text");
+
+                                    b2.Property<string>("Type")
+                                        .HasColumnType("text");
+
+                                    b2.Property<bool>("WaitWebhook")
+                                        .HasColumnType("boolean");
+
+                                    b2.HasKey("FlowClientId", "Id");
+
+                                    b2.ToTable("Clients");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("FlowClientId");
+
+                                    b2.OwnsOne("backend.super_chatbot.Entidades.Content", "Content", b3 =>
+                                        {
+                                            b3.Property<int>("StepFlowClientId")
+                                                .HasColumnType("integer");
+
+                                            b3.Property<int>("StepId")
+                                                .HasColumnType("integer");
+
+                                            b3.Property<string>("ContentValue")
+                                                .HasColumnType("text");
+
+                                            b3.Property<string>("Type")
+                                                .HasColumnType("text");
+
+                                            b3.HasKey("StepFlowClientId", "StepId");
+
+                                            b3.ToTable("Clients");
+
+                                            b3.WithOwner()
+                                                .HasForeignKey("StepFlowClientId", "StepId");
+                                        });
+
+                                    b2.Navigation("Content");
+                                });
+
+                            b1.Navigation("Client");
+
+                            b1.Navigation("Steps");
+                        });
+
+                    b.Navigation("Flow")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("backend.super_chatbot.Entidades.Contact", b =>

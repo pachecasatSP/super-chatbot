@@ -6,7 +6,7 @@ namespace backend.super_chatbot.Middleware;
 public class JwtMiddleware
 {
     private readonly RequestDelegate _next;
-    private List<string> publicEndpoints = ["HTTP: POST /client", "HTTP: GET /webhook", "HTTP: POST /webhook", "HTTP: GET /webhook => ReadHub"];
+    private List<string> publicEndpoints = ["HTTP: POST /client", "HTTP: POST /client/onboarding", "HTTP: GET /webhook", "HTTP: POST /webhook", "HTTP: GET /webhook => ReadHub"];
 
     public JwtMiddleware(RequestDelegate next)
     {
@@ -17,7 +17,7 @@ public class JwtMiddleware
     {
         if (context.GetEndpoint() is null || 
             publicEndpoints.Contains(context.GetEndpoint()?.DisplayName!))
-        {
+        {   
             await _next(context);
         }
         else

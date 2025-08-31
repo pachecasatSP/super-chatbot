@@ -46,8 +46,7 @@ namespace backend.super_chatbot.Services
                     }                     
                     return;
                 }
-
-                //await MarkMessageReadAsync(message.Id!, request.GetSenderPhoneNumber());
+                
                 var handler = _serviceProvider.GetKeyedService<IWebHookHandler>(message.Type)
                     ?? throw new ArgumentException($"Tipo: {message.Type} não possui um handler.");
                 
@@ -64,7 +63,7 @@ namespace backend.super_chatbot.Services
             return (await _clientMeta.SendMessage(request, client), client);
         }
 
-        public async Task SendVerificationCodeMessage(Requests.SendMessageRequest request, int senderId)
+        public async Task<string> SendVerificationCodeMessage(Requests.SendMessageRequest request, int senderId)
         {
             var verificationCode = new Random().Next(100000, 999999);
 
@@ -87,32 +86,7 @@ namespace backend.super_chatbot.Services
             };
 
             var response = await SendMessage(sendVerificationCodeRequest, senderId);
-            var responseObject = JsonConvert.DeserializeObject<MessageResponse>(response.responseText);
-
-            var client = response.client;
-
-            var chat = new Chat()
-            {
-                ContactId = senderId,
-                VerificationCode = verificationCode.ToString(),
-                VerificationCodeExpiration = DateTime.Now.AddMinutes(90),
-                MetaMessageId = responseObject?.messages[0].Id!,
-                CreatedDate = DateTime.Now
-            };
-
-            var contact = await _contactRepository.GetByPhoneNumber(request.NumeroDestino);
-
-            contact ??= new Entidades.Contact()
-            {
-                PhoneNumber = request.NumeroDestino,
-                ClientId = senderId,
-                Name = request.NumeroDestino
-            };
-
-            contact.SetChat(chat);
-
-            client.SetContact(contact);
-            await _clientRepository.Save(client);
+            return verificationCode.ToString();
         }
 
         private async Task MarkMessageReadAsync(string messageId, string senderPhoneNumber)

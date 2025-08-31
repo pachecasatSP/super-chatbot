@@ -32,7 +32,7 @@ namespace backend.super_chatbot.Apis
                                                        [FromServices] IMetaService service,
                                                        HttpContext context, Entidades.Requests.SendTemplateMessageRequest request) =>
             {
-               
+
                 await service.SendMessage(new Entidades.Requests.Meta.SendTemplateMessageRequest()
                 {
                     Template = new Template()
@@ -50,12 +50,12 @@ namespace backend.super_chatbot.Apis
             routes.MapPost("/sendverificationcode", async ([FromServices] ILogger<Program> logger,
                                                            [FromServices] IMetaService service,
                                                        HttpContext context, Entidades.Requests.SendMessageRequest request) =>
-            {              
+            {
 
-                await service.SendVerificationCodeMessage(request, int.Parse(context.Items["clientId"]?.ToString()!));
+                var result = await service.SendVerificationCodeMessage(request, int.Parse(context.Items["clientId"]?.ToString()!));
 
 
-                return DefaultResults.CreateOkResult();
+                return DefaultResults.CreateOkResultMessage(result);
             });
         }
     }

@@ -1,0 +1,41 @@
+{
+  "Steps": [
+    {
+      "NextStep": 2,
+      "Type": "greeting",
+      "WaitWebhook": false,
+      "Content": {
+        "ContentValue": "{                     \u0022text\u0022: {                         \u0022body\u0022: \u0022Ol\u00E1 {{ProfileName}}! \\r\\n Seja bem-vindo a {{ClientName}}!\\r\\n Vamos iniciar seu atendimento. \u0022                     }                 }",
+        "Type": "text"
+      }
+    },
+    {
+      "NextStep": 0,
+      "Type": "menu",
+      "WaitWebhook": true,
+      "Content": {
+        "ContentValue": "{\"Type\":\"interactive\",\"Interactive\":{\"Type\":\"button\",\"Header\":{\"Type\":\"image\",\"image\":{\"Id\":\"851310220533586\"}},\"Body\":{\"Text\":\"Para iniciar, selecione abaixo uma das opções disponíveis.\\r\\n Caso a opção desejada não seja mostrada. .\\r\\nEscreve objetivamente o que precisa.\"},\"Action\":{\"Buttons\":[{\"Type\":\"reply\",\"Reply\":{\"Id\":\"agendar-servico\",\"Title\":\"Agendar Serviço\"}},{\"Type\":\"reply\",\"Reply\":{\"Id\":\"consultar-agendamento\",\"Title\":\"Consultar Agendamento\"}},{\"Type\":\"reply\",\"Reply\":{\"Id\":\"encerrar\",\"Title\":\"Encerrar\"}}]}}}",
+        "Type": "interactive"
+      }
+    }
+  ],
+  "ButtonDefinitions": [
+    {
+      "Title": "agendar-servico",
+      "Type": "apicall",
+      "Definition": {
+        "Method": "get",
+        "RequestUri": "https://yesno.wtf/api?gif=true",
+        "ResultMessage": {
+          "Model": [
+            {
+              "fieldName": "answer",
+              "displayName": "Resposta",
+              "type": "text"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

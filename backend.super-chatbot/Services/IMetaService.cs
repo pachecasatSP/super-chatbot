@@ -8,6 +8,6 @@ namespace backend.super_chatbot.Services
     {
         Task<(string responseText, Client client)> SendMessage<T>(T request, int senderId) where T : SendMessageRequest;
         Task HandleWebhookMessage(MessagesRequest request);
-        Task SendVerificationCodeMessage(Requests.SendMessageRequest  request, int senderId);
+        Task<string> SendVerificationCodeMessage(Requests.SendMessageRequest  request, int senderId);
     }
 }

@@ -26,7 +26,7 @@ namespace backend.super_chatbot.Services.WebHookHandlers
             if (payload is null)
                 _logger.Information("Propriedade 'interactive' veio nula.");
             
-            var client = await _clientRepository.GetByPhoneNumber(message.GetSenderPhoneNumber());
+            var client = await _clientRepository.GetByPhoneNumber(message.GetDestinationPhoneNumber());
             switch (payload.Button_reply.Id)
             {
                 case "download-template":

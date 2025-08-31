@@ -18,7 +18,7 @@ namespace backend.super_chatbot.Services.WebHookHandlers
         }
         public async Task HandleIncomingMessage(MessagesRequest message)
         {
-            var senderPhoneNumber = message.GetSenderPhoneNumber();
+            var senderPhoneNumber = message.GetDestinationPhoneNumber();
             var clickedPayload = message.GetButton().Payload;
 
             var client = await _clientRepository.GetByPhoneNumber(senderPhoneNumber);

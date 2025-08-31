@@ -24,7 +24,7 @@ namespace backend.super_chatbot.Repositories
             await Context.Clients.FirstOrDefaultAsync(x => x.Id == Id);
                
         public async Task<Client> GetByPhoneNumber(string display_phone_number) => 
-            await Context.Clients.FirstOrDefaultAsync(x => x.PhoneNumber == display_phone_number);
+            await Context.Clients.Include(x => x.Contacts).FirstOrDefaultAsync(x => x.PhoneNumber == display_phone_number);
 
         public async Task<Client> Save(Client entity)
         {

@@ -15,9 +15,16 @@ namespace backend.super_chatbot
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Client>(entity =>
-            {               
+            {
                 entity.HasKey(e => e.Id);
                 entity.HasMany(e => e.Contacts).WithOne(x => x.Client).HasForeignKey(x => x.ClientId);
+                entity.OwnsOne(client =>
+                    client.Flow, builder =>
+                    {
+                        builder.ToJson();
+                        builder.OwnsMany(x => x.Steps).OwnsOne(x => x.Content);
+                        builder.WithOwner(x => x.Client).HasPrincipalKey(x => x.Id);
+                    });
             });
 
             modelBuilder.Entity<Contact>(entity =>
@@ -25,6 +32,7 @@ namespace backend.super_chatbot
                 entity.HasKey(e => e.Id);
                 entity.HasMany(e => e.ChatHistory).WithOne(x => x.Contact).HasForeignKey(x => x.ContactId);
             });
+
         }
     }
 }

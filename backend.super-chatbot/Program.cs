@@ -23,7 +23,7 @@ JsonConvert.DefaultSettings = () => new JsonSerializerSettings
     NullValueHandling = NullValueHandling.Ignore,
     DateFormatString = "dd-MM-yyyy",
     DefaultValueHandling = DefaultValueHandling.Ignore,
-    MaxDepth = 3
+    MaxDepth = 10
 };
 
 var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
@@ -42,9 +42,9 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft.AspNetCore.Routing", LogEventLevel.Warning)
     .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Warning)
     .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database", LogEventLevel.Error)
-    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Information)
     .Enrich.FromLogContext()
-    .WriteTo.Console(new ElasticsearchJsonFormatter())
+    .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Information)
     .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(configuration.GetSection("ElasticSearch__Uri").Value!))
     {
         ApiKey = configuration.GetSection("ElasticSearch__ApiKey").Value!,
@@ -82,7 +82,7 @@ builder.Services.Configure<WABConfiguration>(configuration.GetSection(WABConfigu
 
 builder.Services.AddDbContext<SuperChatContext>((DbContextOptionsBuilder options) =>
 {
-    options.UseSqlServer(connectionString: configuration.GetConnectionString("Default") ?? string.Empty, dboptions =>
+    options.UseNpgsql(connectionString: configuration.GetConnectionString("DefaultDB") ?? string.Empty, dboptions =>
     {
         dboptions.EnableRetryOnFailure(10, TimeSpan.FromSeconds(1), null);
         dboptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
@@ -101,12 +101,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors();
+app.UseCors(policy =>
+{
+    policy.AllowAnyOrigin();
+    policy.AllowAnyHeader();
+    policy.AllowAnyMethod();
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseHttpsRedirection();
-app.MapClientEndpoints();
+app.MapCustomerEndpoints();
 app.MapWebhookEndpoints();
 app.MapSendMessageEndpoints();
 

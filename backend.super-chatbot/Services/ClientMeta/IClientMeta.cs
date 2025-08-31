@@ -8,5 +8,7 @@ namespace backend.super_chatbot.Services.ClientMeta
         Task<string> SendMessage<T>(T request, Client client) where T : SendMessageRequest;
         Task<MediaResponse> GetMedia(string mediaId, Client client);
         Task<Stream> DownloadMedia(string url, Client client);
+        Task<MetaAuthTokenResponse> ExchangeCodeByToken(string? code);
+        Task<bool> RegisterAccount(Client client, string customerPhoneNumberId);
     }
 }
